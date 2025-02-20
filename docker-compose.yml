@@ -61,7 +61,6 @@ services:
       interval: 1s
       timeout: 5s
       retries: 120
-
   elasticsearch:
     depends_on:
       setup:
@@ -75,6 +74,7 @@ services:
       - ${ES_PORT}:9200
     restart: always
     environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - node.name=ecp-elasticsearch
       - cluster.name=${CLUSTER_NAME}
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
@@ -94,11 +94,6 @@ services:
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.security.transport.ssl.client_authentication=optional
       - xpack.license.self_generated.type=${LICENSE}
-    mem_limit: ${MEM_LIMIT}
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     healthcheck:
       test:
         [
@@ -132,7 +127,7 @@ services:
       - SERVER_SSL_CERTIFICATE=config/certs/kibana/kibana.crt
       - SERVER_SSL_KEY=config/certs/kibana/kibana.key
       - SERVER_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-    mem_limit: ${MEM_LIMIT}
+      - NODE_OPTIONS=--max-old-space-size=2048
     healthcheck:
       test:
         [
@@ -142,7 +137,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-
+  
   fleet-server:
       depends_on:
         kibana:
